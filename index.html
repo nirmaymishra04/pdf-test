@@ -223,23 +223,34 @@
       const iframe = document.getElementById('pdfFrame');
 
       // Construct JSON payload internally from simple form inputs
-      const payload = {
-        locationName: locationName,
-        rooftopAreaSqFt: rooftopAreaSqFt,
-        estimatedAnnualHarvestLiters: estimatedAnnualHarvestLiters,
-        recommendations: [
-          {
-            structureType: "Modular Filtration Pit",
-            estimatedCost: 450,
-            impactLevel: "High (Direct Recharge)"
-          },
-          {
-            structureType: "First Flush Diverter",
-            estimatedCost: 120,
-            impactLevel: "Medium (Water Quality)"
-          }
-        ]
-      };
+     const payload = {
+  reportNo: "RWH-2026-000123",
+  date: "18 October 2026",
+  dateShort: "18 OCT 2026",
+  userName: "Sample User (Rahul Sharma)",
+  assessmentId: "RWH-2026-000123",
+  latLng: "13.0827° N, 80.2707° E",
+  location: locationName,
+  annualHarvestableWater: `${(estimatedAnnualHarvestLiters / 1000).toFixed(1)} m³`,
+  annualDemandMet: "77%",
+  harvestingSuitability: "HIGH",
+  annualHarvestLitres: estimatedAnnualHarvestLiters.toLocaleString(),
+  annualDemandLitres: "197,100",
+  roofArea: `${rooftopAreaSqFt} sq ft`,
+  roofMaterial: "Concrete (RCC)",
+  occupants: 4,
+  groundwaterLevel: "10.75 m below ground",
+  rainfallIntensity: "50 mm/hr (auto-fetched)",
+  annualRainfall: "1,400 mm (assumed)",
+  runoffCoefficient: "0.80",
+  peakRunoffRate: "1.67 L/s",
+  rechargeVolume: "1.50 m³",
+  structureName: "Recharge pit (filter media backfilled)",
+  suggestedSize: "1.2 m dia × 2.0 m deep (= 2.3 m³)",
+  preTreatment: "Leaf screen + first-flush diverter before the pit",
+  maintenance: "Clean screens before monsoon; desilt pit yearly",
+  verificationId: "EWH-7K4Q-2026-000123"
+};
 
       // UI Loading State
       statusBadge.className = 'status-badge status-loading';
