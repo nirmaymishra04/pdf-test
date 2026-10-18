@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EasyRWH - Technical Report Generator</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Header / Navigation -->
+  <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-lg bg-sky-600 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-sky-500/20">
+          <i class="fa-solid font-bold fa-cloud-showers-water"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+            EasyRWH <span class="text-xs px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-400 font-semibold border border-sky-500/30">API Test Bench</span>
+          </h1>
+          <p class="text-xs text-slate-400">Technical Report & PDF Generator Dashboard</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-3 text-xs">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Service Active
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+    
+    <!-- Left Column: Parameters & API Config Form -->
+    <div class="lg:col-span-5 space-y-6">
+      
+      <!-- Target Server Config -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-5 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+          <h2 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-server text-sky-600"></i> API Endpoint Settings
+          </h2>
+          <span class="text-xs text-slate-500">CORS Target</span>
+        </div>
+        <div class="p-5 space-y-4">
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">Backend Server URL</label>
+            <div class="relative rounded-md shadow-sm">
+              <input type="text" id="apiEndpoint" 
+                     value="http://localhost:3000/reports/generate-pdf"
+                     placeholder="https://your-api.vercel.app/reports/generate-pdf"
+                     class="w-full text-xs sm:text-sm pl-3 pr-20 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all font-mono" />
+              <button type="button" onclick="resetDefaultUrl()" 
+                      class="absolute right-2 top-2 px-2 py-0.5 text-[10px] font-medium bg-slate-100 hover:bg-slate-200 text-slate-600 rounded transition-colors">
+                Reset Local
+              </button>
+            </div>
+            <p class="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1">
+              <i class="fa-solid fa-circle-info text-sky-500"></i> Use localhost or your deployed Vercel/Render API endpoint.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Inputs -->
+      <form id="reportForm" onsubmit="handleGeneratePdf(event)" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-5 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+          <h2 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-sliders text-emerald-600"></i> Feasibility Payload Data
+          </h2>
+          <button type="button" onclick="loadPresetData()" class="text-xs text-sky-600 hover:text-sky-700 font-medium">
+            Reset Preset
+          </button>
+        </div>
+
+        <div class="p-5 space-y-4">
+          <!-- Location Name -->
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">Location Name</label>
+            <input type="text" id="locationName" required
+                   class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500" 
+                   placeholder="e.g. Sector 62, Noida, UP" />
+          </div>
+
+          <!-- Numeric Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-700 mb-1">Rooftop Area (Sq. Ft.)</label>
+              <input type="number" id="rooftopAreaSqFt" required min="1"
+                     class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-700 mb-1">Est. Annual Harvest (Liters)</label>
+              <input type="number" id="estimatedAnnualHarvestLiters" required min="0"
+                     class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500" />
+            </div>
+          </div>
+
+          <!-- Dynamic Recommendations List -->
+          <div class="pt-2 border-t border-slate-100">
+            <div class="flex items-center justify-between mb-2">
+              <label class="text-xs font-medium text-slate-700 flex items-center gap-1.5">
+                <i class="fa-solid fa-list-check text-slate-400"></i> Smart Structure Recommendations
+              </label>
+              <button type="button" onclick="addRecommendationRow()" 
+                      class="text-xs text-emerald-600 hover:text-emerald-700 font-semibold flex items-center gap-1">
+                <i class="fa-solid fa-plus text-[10px]"></i> Add Structure
+              </button>
+            </div>
+
+            <div id="recommendationsContainer" class="space-y-3 max-h-60 overflow-y-auto custom-scrollbar pr-1">
+              <!-- Dynamic Rows inserted here by JS -->
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="pt-4 border-t border-slate-100">
+            <button type="submit" id="generateBtn" 
+                    class="w-full py-3 px-4 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-medium text-sm rounded-lg shadow-md shadow-sky-600/20 flex items-center justify-center gap-2 transition-all">
+              <i class="fa-solid fa-file-pdf"></i>
+              <span>Generate Technical PDF</span>
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Live Terminal / Request Logger -->
+      <div class="bg-slate-900 rounded-xl shadow-md border border-slate-800 overflow-hidden text-slate-200">
+        <div class="px-4 py-2.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between text-xs">
+          <span class="font-mono text-slate-400 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+            <span class="ml-2">Request Log & Payload</span>
+          </span>
+          <button onclick="clearLogs()" class="text-[10px] text-slate-500 hover:text-slate-300">Clear</button>
+        </div>
+        <pre id="loggerOutput" class="p-4 font-mono text-xs max-h-48 overflow-y-auto custom-scrollbar text-emerald-400 space-y-1">
+> System initialized. Ready to execute API request.
+        </pre>
+      </div>
+
+    </div>
+
+    <!-- Right Column: Interactive PDF Preview Container -->
+    <div class="lg:col-span-7 flex flex-col">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex-1 flex flex-col overflow-hidden min-h-[600px]">
+        
+        <!-- Preview Header Bar -->
+        <div class="px-5 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-eye text-slate-500"></i>
+            <h2 class="text-sm font-semibold text-slate-800">PDF Document Preview</h2>
+          </div>
+          <div class="flex items-center space-x-2">
+            <a id="downloadBtn" href="#" download="EasyRWH_Technical_Report.pdf" 
+               class="hidden px-3 py-1.5 text-xs font-medium bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors flex items-center gap-1.5 shadow-sm">
+              <i class="fa-solid fa-download"></i> Download PDF
+            </a>
+            <button onclick="fullscreenPreview()" id="expandBtn" class="hidden text-slate-400 hover:text-slate-600 p-1.5 rounded">
+              <i class="fa-solid fa-expand"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Preview Viewport -->
+        <div id="previewArea" class="flex-1 bg-slate-100 flex flex-col items-center justify-center p-6 relative">
+          
+          <!-- Empty State -->
+          <div id="emptyState" class="text-center max-w-sm space-y-3">
+            <div class="w-16 h-16 bg-slate-200 text-slate-400 rounded-full flex items-center justify-center mx-auto text-2xl">
+              <i class="fa-regular fa-file-pdf"></i>
+            </div>
+            <h3 class="text-base font-semibold text-slate-700">No PDF Generated Yet</h3>
+            <p class="text-xs text-slate-500">
+              Fill out the technical report parameters on the left and click <strong>"Generate Technical PDF"</strong> to send the JSON request to your API.
+            </p>
+          </div>
+
+          <!-- Loading State -->
+          <div id="loadingState" class="hidden text-center space-y-3">
+            <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-sky-600 border-t-transparent"></div>
+            <p class="text-sm font-medium text-slate-700">Communicating with NestJS API...</p>
+            <p class="text-xs text-slate-500">Launching Puppeteer & Rendering Handlebars Layout...</p>
+          </div>
+
+          <!-- Error State -->
+          <div id="errorState" class="hidden text-center max-w-md space-y-3 bg-rose-50 border border-rose-200 p-6 rounded-xl text-rose-800">
+            <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto text-xl">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="text-sm font-bold text-rose-900">API Connection Failed</h3>
+            <p id="errorMessage" class="text-xs text-rose-700 text-left font-mono bg-white p-3 rounded border border-rose-200 overflow-x-auto">
+              Failed to fetch.
+            </p>
+            <div class="text-[11px] text-slate-600 text-left space-y-1">
+              <p class="font-semibold text-slate-700">Possible Fixes:</p>
+              <ul class="list-disc pl-4 space-y-0.5">
+                <li>Check if NestJS server is running (<code class="bg-slate-200 px-1 rounded">npm run start:dev</code>).</li>
+                <li>Verify CORS is enabled in NestJS (<code class="bg-slate-200 px-1 rounded">app.enableCors()</code>).</li>
+                <li>Ensure endpoint URL matches target server port.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- PDF Blob Frame -->
+          <iframe id="pdfFrame" class="hidden w-full h-full border-0 rounded-lg shadow-inner bg-white"></iframe>
+
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+    <p>Easy Rainwater Harvesting Platform &bull; API Technical Report Pipeline Verification Bench</p>
+  </footer>
+
+  <script>
+    // Initial Preset Data
+    const defaultData = {
+      locationName: "Sector 62, Community Center, Noida",
+      rooftopAreaSqFt: 2850,
+      estimatedAnnualHarvestLiters: 215000,
+      recommendations: [
+        { structureType: "Modular Recharge Pit", estimatedCost: 550, impactLevel: "High (Borewell Direct)" },
+        { structureType: "First Flush Diverter", estimatedCost: 150, impactLevel: "Medium (Filtration)" },
+        { structureType: "Silt Trap Chamber", estimatedCost: 280, impactLevel: "High (Maintenance)" }
+      ]
+    };
+
+    let activePdfBlobUrl = null;
+
+    // Window Load
+    window.onload = function() {
+      loadPresetData();
+    };
+
+    // Reset default URL
+    function resetDefaultUrl() {
+      document.getElementById('apiEndpoint').value = "http://localhost:3000/reports/generate-pdf";
+      logToTerminal("Endpoint URL reset to local default.");
+    }
+
+    // Populate Preset Data
+    function loadPresetData() {
+      document.getElementById('locationName').value = defaultData.locationName;
+      document.getElementById('rooftopAreaSqFt').value = defaultData.rooftopAreaSqFt;
+      document.getElementById('estimatedAnnualHarvestLiters').value = defaultData.estimatedAnnualHarvestLiters;
+
+      const container = document.getElementById('recommendationsContainer');
+      container.innerHTML = '';
+
+      defaultData.recommendations.forEach(rec => {
+        addRecommendationRow(rec.structureType, rec.estimatedCost, rec.impactLevel);
+      });
+
+      logToTerminal("Preset feasibility data loaded.");
+    }
+
+    // Add Dynamic Recommendation Row
+    function addRecommendationRow(type = '', cost = '', impact = 'High') {
+      const container = document.getElementById('recommendationsContainer');
+      const rowId = 'row_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+
+      const row = document.createElement('div');
+      row.id = rowId;
+      row.className = "flex items-center gap-2 bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-xs";
+      row.innerHTML = `
+        <div class="flex-1 space-y-1">
+          <input type="text" placeholder="Structure Type" value="${type}" required 
+                 class="rec-type w-full px-2 py-1 border border-slate-300 rounded focus:ring-1 focus:ring-sky-500" />
+          <div class="grid grid-cols-2 gap-1">
+            <input type="number" placeholder="Cost ($)" value="${cost}" required 
+                   class="rec-cost w-full px-2 py-1 border border-slate-300 rounded focus:ring-1 focus:ring-sky-500" />
+            <input type="text" placeholder="Impact Level" value="${impact}" required 
+                   class="rec-impact w-full px-2 py-1 border border-slate-300 rounded focus:ring-1 focus:ring-sky-500" />
+          </div>
+        </div>
+        <button type="button" onclick="removeRecommendationRow('${rowId}')" 
+                class="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded transition-colors">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+      `;
+
+      container.appendChild(row);
+    }
+
+    // Remove Dynamic Recommendation Row
+    function removeRecommendationRow(id) {
+      const row = document.getElementById(id);
+      if (row) row.remove();
+    }
+
+    // Logging helper
+    function logToTerminal(message, isError = false) {
+      const output = document.getElementById('loggerOutput');
+      const timestamp = new Date().toLocaleTimeString();
+      const colorClass = isError ? 'text-rose-400' : 'text-emerald-400';
+      output.innerHTML += `\n<span class="${colorClass}">[${timestamp}] ${message}</span>`;
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function clearLogs() {
+      document.getElementById('loggerOutput').innerHTML = `> Terminal logs cleared.`;
+    }
+
+    // Form Submission & API Trigger
+    async function handleGeneratePdf(e) {
+      e.preventDefault();
+
+      const endpoint = document.getElementById('apiEndpoint').value.trim();
+      if (!endpoint) {
+        alert("Please specify a valid API endpoint URL.");
+        return;
+      }
+
+      // Collect recommendations array
+      const recRows = document.querySelectorAll('#recommendationsContainer > div');
+      const recommendations = Array.from(recRows).map(row => ({
+        structureType: row.querySelector('.rec-type').value,
+        estimatedCost: Number(row.querySelector('.rec-cost').value),
+        impactLevel: row.querySelector('.rec-impact').value
+      }));
+
+      // Construct final JSON payload matching GenerateReportDto
+      const payload = {
+        locationName: document.getElementById('locationName').value,
+        rooftopAreaSqFt: Number(document.getElementById('rooftopAreaSqFt').value),
+        estimatedAnnualHarvestLiters: Number(document.getElementById('estimatedAnnualHarvestLiters').value),
+        recommendations: recommendations
+      };
+
+      // UI States
+      setUIState('loading');
+      logToTerminal(`POST Request sent to: ${endpoint}`);
+      logToTerminal(`Payload: ${JSON.stringify(payload)}`);
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);
+        }
+
+        // Response is binary PDF buffer
+        const blob = await response.blob();
+        
+        if (activePdfBlobUrl) {
+          URL.revokeObjectURL(activePdfBlobUrl);
+        }
+        
+        activePdfBlobUrl = URL.createObjectURL(blob);
+
+        // Load into iframe
+        const frame = document.getElementById('pdfFrame');
+        frame.src = activePdfBlobUrl;
+
+        // Setup Download link
+        const downloadBtn = document.getElementById('downloadBtn');
+        downloadBtn.href = activePdfBlobUrl;
+        downloadBtn.classList.remove('hidden');
+        document.getElementById('expandBtn').classList.remove('hidden');
+
+        setUIState('success');
+        logToTerminal(`SUCCESS: PDF binary payload received (${(blob.size / 1024).toFixed(2)} KB).`);
+
+      } catch (err) {
+        console.error("API Call Error:", err);
+        document.getElementById('errorMessage').innerText = err.message || "Network Error / Server unreachable";
+        setUIState('error');
+        logToTerminal(`ERROR: ${err.message}`, true);
+      }
+    }
+
+    // Toggle Preview UI States
+    function setUIState(state) {
+      const emptyState = document.getElementById('emptyState');
+      const loadingState = document.getElementById('loadingState');
+      const errorState = document.getElementById('errorState');
+      const frame = document.getElementById('pdfFrame');
+      const generateBtn = document.getElementById('generateBtn');
+
+      emptyState.classList.add('hidden');
+      loadingState.classList.add('hidden');
+      errorState.classList.add('hidden');
+      frame.classList.add('hidden');
+
+      if (state === 'loading') {
+        loadingState.classList.remove('hidden');
+        generateBtn.disabled = true;
+        generateBtn.classList.add('opacity-75', 'cursor-not-allowed');
+      } else if (state === 'success') {
+        frame.classList.remove('hidden');
+        generateBtn.disabled = false;
+        generateBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+      } else if (state === 'error') {
+        errorState.classList.remove('hidden');
+        generateBtn.disabled = false;
+        generateBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+      } else {
+        emptyState.classList.remove('hidden');
+      }
+    }
+
+    function fullscreenPreview() {
+      if (activePdfBlobUrl) {
+        window.open(activePdfBlobUrl, '_blank');
+      }
+    }
+  </script>
+</body>
+</html>
